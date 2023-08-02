@@ -10,7 +10,7 @@ class PysicsEngine2D:
     BALL_RADIUS = 7
     BALL_ELASTICITY = 0.9
     BALL_FRICTION = 0.1
-    GRAVITY = 0,2000
+    GRAVITY = 0,800
     SEGMENT_THICKNESS = 4
     
     def __init__(self,game):
