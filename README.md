@@ -1,6 +1,12 @@
-# Pinball
+<div align="center">
+ 
+<h1>Pinball</h1>
+
+<img src="preview.gif">
 
 #### Status: Em progresso
+
+</div>
 
 ## Sobre
 
