@@ -1,0 +1,4 @@
+- Melhorar o poligono dos flipers
+- Adicionar bordas laterais e no topo
+- Criar os dois flipers com uma função apenas
+- Melhorar a fisica dos flipers

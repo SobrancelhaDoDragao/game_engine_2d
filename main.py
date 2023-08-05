@@ -19,6 +19,7 @@ class Game:
        
     def update(self):
         self.game_engine.display.set_caption(f'{self.clock.get_fps() :.0f}')
+        self.screen.fill(pg.Color('white'))
         self.PysicsEngine.update()
         pg.display.flip()
         self.clock.tick(self.FPS)
@@ -38,11 +39,13 @@ class Game:
             elif event.type == self.game_engine.KEYDOWN and event.key == self.game_engine.K_ESCAPE:
                 self.running = False
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1: # LMB
-                print(event.pos)
                 self.PysicsEngine.new_ball(event.pos)
+            elif event.type == pg.KEYDOWN and event.key == pg.K_j:
+                self.PysicsEngine.botao()
+            elif event.type == pg.KEYDOWN and event.key == pg.K_f:
+                self.PysicsEngine.botaoleft()
 
 # Caso o arquivo esteja sendo executado diretamente como arquivo principal
 if __name__ == "__main__":
-
     app = Game()
     app.run()
