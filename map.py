@@ -66,10 +66,10 @@ class MainMap(AbstractMap):
         # Dividindo a altura da tela pela quantidade de linhas
         ROW_HEIGHT = self.HEIGHT// ROW
         
-        MARGIN_BOTTOM = 40
+        MARGIN_BOTTOM = 60
 
         self.draw_funnel(COL_WIDTH,ROW_HEIGHT,MARGIN_BOTTOM)
-        self.draw_borders(COL_WIDTH,ROW_HEIGHT,MARGIN_BOTTOM)
+        self.draw_borders(COL_WIDTH,ROW_HEIGHT)
         
     def draw_funnel(self,COL_WIDTH,ROW_HEIGHT,MARGIN_BOTTOM):
         """
@@ -84,7 +84,7 @@ class MainMap(AbstractMap):
         # Segmento pocisionando na primeira coluna até a penultima linha
         lateral_left = (COL_WIDTH*0.8 - INCLI,ROW_HEIGHT*2),(COL_WIDTH*1,ROW_HEIGHT*4)
         # Segmento pocisionado na ultima coluna ate a penultina linha
-        lateral_right =(COL_WIDTH*4.2 + INCLI,ROW_HEIGHT*2),(COL_WIDTH*4,ROW_HEIGHT*4)
+        lateral_right = (COL_WIDTH*4.2 + INCLI,ROW_HEIGHT*2),(COL_WIDTH*4,ROW_HEIGHT*4)
 
         funil_left = (COL_WIDTH*1,ROW_HEIGHT*4),(COL_WIDTH*2,ROW_HEIGHT*5 - MARGIN_BOTTOM)
         
@@ -99,17 +99,27 @@ class MainMap(AbstractMap):
         # Definindo a posicao dos flippers
         self.flippers = (COL_WIDTH*2,ROW_HEIGHT*5 - MARGIN_BOTTOM),(COL_WIDTH*3,ROW_HEIGHT*5 - MARGIN_BOTTOM)
 
-    def draw_borders(self,COL_WIDTH,ROW_HEIGHT,MARGIN_BOTTOM):
+    def draw_borders(self,COL_WIDTH,ROW_HEIGHT):
         """
         Desenha bordas entorno da tela
         """
         top_border = (0,0),(self.WIDHT,0)
-        left_border = (self.WIDHT,0),(self.WIDHT,self.HEIGHT)
-        right_border = (0,0),(0,self.HEIGHT)
+        right_border = (self.WIDHT,0),(self.WIDHT,ROW_HEIGHT*2)
+        left_border = (0,0),(0,ROW_HEIGHT*2)
+
+        lateral_double_left = (0,ROW_HEIGHT*2),(COL_WIDTH*0.5,ROW_HEIGHT*4)
+        funil_double_left = (COL_WIDTH*0.5,ROW_HEIGHT*4),(COL_WIDTH*1.5,ROW_HEIGHT*5)
+        
+        lateral_double_right = (self.WIDHT,ROW_HEIGHT*2),(self.WIDHT - COL_WIDTH*0.5,ROW_HEIGHT*4)
+        funil_double_right = (self.WIDHT - COL_WIDTH*0.5,ROW_HEIGHT*4),(self.WIDHT - COL_WIDTH*1.5,ROW_HEIGHT*5)
 
         self.platforms.append(top_border)
         self.platforms.append(left_border)
         self.platforms.append(right_border)
+        self.platforms.append(lateral_double_left)
+        self.platforms.append(funil_double_left)
+        self.platforms.append(lateral_double_right)
+        self.platforms.append(funil_double_right)
 
     @property
     def flippers_position(self):

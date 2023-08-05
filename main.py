@@ -5,7 +5,7 @@ class Game:
     """
     Classe principal criada para gerenciar o jogo
     """
-    WIDTH, HEIGHT = 600, 600
+    WIDTH, HEIGHT = 800, 600
     WIN_SIZE = WIDTH, HEIGHT 
     FPS = 60
 
@@ -40,9 +40,9 @@ class Game:
                 self.running = False
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1: # LMB
                 self.PysicsEngine.new_ball(event.pos)
-            elif event.type == pg.KEYDOWN and event.key == pg.K_j:
+            elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
                 self.PysicsEngine.botao()
-            elif event.type == pg.KEYDOWN and event.key == pg.K_f:
+            elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
                 self.PysicsEngine.botaoleft()
 
 # Caso o arquivo esteja sendo executado diretamente como arquivo principal
