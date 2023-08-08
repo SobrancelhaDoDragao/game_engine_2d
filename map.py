@@ -60,7 +60,7 @@ class AbstractMap(ABC):
         pass
 
 
-class Main_Map(AbstractMap):
+class MainMap(AbstractMap):
     """
     Mapa principal do jogo pinball
     """
