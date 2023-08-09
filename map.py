@@ -52,7 +52,6 @@ class AbstractMap(ABC):
         pass
 
     @abstractmethod
-    @property
     def flippers_position(self):
         """
         Função que retorna a posicao que deve ficar os flippers
@@ -125,8 +124,8 @@ class MainMap(AbstractMap):
         """
         Desenha bordas entorno da tela
         """
-        top_border = (0, 0), (self.WIDHT, 0)
-        right_border = (self.WIDHT, 0), (self.WIDHT, row_height * 2)
+        top_border = (0, 0), (self.width, 0)
+        right_border = (self.width, 0), (self.width, row_height * 2)
         left_border = (0, 0), (0, row_height * 2)
 
         lateral_double_left = (0, row_height * 2), (col_width * 0.5, row_height * 4)
@@ -135,12 +134,12 @@ class MainMap(AbstractMap):
             row_height * 5,
         )
 
-        lateral_double_right = (self.WIDHT, row_height * 2), (
-            self.WIDHT - col_width * 0.5,
+        lateral_double_right = (self.width, row_height * 2), (
+            self.width - col_width * 0.5,
             row_height * 4,
         )
-        funil_double_right = (self.WIDHT - col_width * 0.5, row_height * 4), (
-            self.WIDHT - col_width * 1.5,
+        funil_double_right = (self.width - col_width * 0.5, row_height * 4), (
+            self.width - col_width * 1.5,
             row_height * 5,
         )
 

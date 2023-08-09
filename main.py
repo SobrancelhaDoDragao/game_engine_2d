@@ -54,11 +54,11 @@ class Game:
             ):
                 self.running = False
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:  # LMB
-                self.PysicsEngine.new_ball(event.pos)
+                self.pysics_engine.new_ball(event.pos)
             elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
-                self.PysicsEngine.botao()
+                self.pysics_engine.botao()
             elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
-                self.PysicsEngine.botaoleft()
+                self.pysics_engine.botaoleft()
 
 
 # Caso o arquivo esteja sendo executado diretamente como arquivo principal
