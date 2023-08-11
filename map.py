@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 
 import pygame as pg
 import pymunk
+from pymunk import Vec2d
 
 
 class AbstractMap(ABC):
@@ -14,7 +15,7 @@ class AbstractMap(ABC):
 
     thickness = 5
     segment_color = pg.Color("black")
-    segment_friction = 1.0
+    segment_friction = 0.4
     segment_elasticity = 0.5
 
     def __init__(self, win_size, space):
@@ -23,6 +24,7 @@ class AbstractMap(ABC):
         self.height = win_size[1]
 
         self.platforms = []
+        self.polys = []
         self.segments_points()
 
     def draw_map(self):
@@ -43,6 +45,15 @@ class AbstractMap(ABC):
         segment_shape.friction = self.segment_friction
         segment_shape.elasticity = self.segment_elasticity
         self.space.add(segment_shape)
+
+    def create_static_poly(self, polygon, pos):
+        body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        body.position = pos
+        shape = pymunk.Poly(body, polygon)
+        shape.elasticity = 1
+        shape.friction = 0.2
+        shape.color = pg.Color("green")
+        self.space.add(body, shape)
 
     @abstractmethod
     def segments_points(self):
@@ -76,6 +87,34 @@ class MainMap(AbstractMap):
 
         self.draw_funnel(col_width, row_height, margin_bottom)
         self.draw_borders(col_width, row_height)
+        self.draw_polys(col_width, row_height)
+
+    def draw_polys(self, col_width, row_height):
+        self.create_buppers(col_width, row_height)
+
+    def create_buppers(self, col_width, row_height):
+        width, height = 80, 80
+        x = width * 1
+        padding = width // 2
+
+        # Positio GRID right bumpper
+        width_position = col_width * 1 + padding
+        height_position_right = row_height * 4 - (height + padding)
+
+        # Right bupper
+        vertices_bupper_right = [(0, 0), (width, x), (width, height), (0, height)]
+        position_bupper_right = (width_position, height_position_right)
+
+        self.create_static_poly(vertices_bupper_right, position_bupper_right)
+
+        # Positio GRID left bumpper
+        width_position_left = col_width * 4 - (width + padding)
+
+        # left bupper
+        vertices_bupper_left = [(0, x), (width, 0), (width, height), (0, height)]
+        position_bupper_left = (width_position_left, height_position_right)
+
+        self.create_static_poly(vertices_bupper_left, position_bupper_left)
 
     def draw_funnel(self, col_width, row_height, margin_bottom):
         """

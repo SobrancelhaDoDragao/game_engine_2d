@@ -1,3 +1,2 @@
 - Melhorar o poligono dos flipers
-- Criar os dois flipers com uma função apenas
 - Melhorar a fisica dos flipers
