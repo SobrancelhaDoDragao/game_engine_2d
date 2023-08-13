@@ -12,10 +12,18 @@ class AbstractMap(ABC):
     Classe abstrada para criação de mapas
     """
 
-    thickness = 5
+    segment_thickness = 5
     segment_color = pg.Color("black")
     segment_friction = 0.4
     segment_elasticity = 0.5
+
+    static_poly_elasticy = 1
+    static_poly_friction = 0.2
+    static_poly_color = pg.Color("green")
+
+    static_ball_elasticy = 1
+    static_ball_friction = 0.2
+    static_ball_color = pg.Color("green")
 
     def __init__(self, win_size, space):
         self.space = space
@@ -23,13 +31,13 @@ class AbstractMap(ABC):
         self.height = win_size[1]
 
         self.platforms = []
-        self.polys = []
-        self.segments_points()
 
     def draw_map(self):
         """
         Funcao que desenha o mapa do jogo
         """
+        self.create_elements()
+
         for plataform in self.platforms:
             self.create_segment(*plataform)
 
@@ -40,7 +48,7 @@ class AbstractMap(ABC):
         """
         # posição
         segment_shape = pymunk.Segment(
-            self.space.static_body, from_, to_, self.thickness
+            self.space.static_body, from_, to_, self.segment_thickness
         )
         # Propriedades do segmento
         segment_shape.color = self.segment_color
@@ -55,13 +63,25 @@ class AbstractMap(ABC):
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = pos
         shape = pymunk.Poly(body, polygon)
-        shape.elasticity = 1
-        shape.friction = 0.2
-        shape.color = pg.Color("green")
+        shape.elasticity = self.static_poly_elasticy
+        shape.friction = self.static_poly_friction
+        shape.color = self.static_poly_color
+        self.space.add(body, shape)
+
+    def create_a_static_ball(self, pos, radius):
+        """
+        Funcao para criar um bola static no mapa
+        """
+        body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        body.position = pos
+        shape = pymunk.Circle(body, radius)
+        shape.elasticity = self.static_ball_elasticy
+        shape.friction = self.static_ball_friction
+        shape.color = self.static_ball_color
         self.space.add(body, shape)
 
     @abstractmethod
-    def segments_points(self):
+    def create_elements(self):
         """
         Função para calcular as coordenadas dos segmentos: ponto inicial: x,y, ponto final: x,y
         """
@@ -80,32 +100,44 @@ class MainMap(AbstractMap):
     Mapa principal do jogo pinball
     """
 
-    def segments_points(self):
+    def create_elements(self):
         """
-        Funcao que desenha todos os elementos do mapa
+        Funcao que desenha todos os elementos do mapa,  que e chamada no comeco do jogo
         """
+
         # Vou usar o conceito de GRID para posicionar os elementos na tela.
-        col, row = 5, 5
+        self.col, self.row = 5, 5
         # Dividindo a largura da tela pela quantidade de colunas
-        col_width = self.width // col
+        self.col_width = self.width // self.col
         # Dividindo a altura da tela pela quantidade de linhas
-        row_height = self.height // row
+        self.row_height = self.height // self.row
 
-        margin_bottom = 60
+        self.margin_bottom = 60
 
-        self.draw_funnel(col_width, row_height, margin_bottom)
-        self.draw_borders(col_width, row_height)
-        self.draw_polys(col_width, row_height)
+        self.draw_funnel()
+        self.draw_borders()
+        self.draw_polys()
+        self.draw_balls()
 
-    def draw_polys(self, col_width, row_height):
+    def draw_polys(self):
         """
         Funcao que desenha os buppers
         """
-        self.create_buppers(col_width, row_height)
+        self.create_buppers()
 
-    def create_buppers(self, col_width, row_height):
+    def draw_balls(self):
         """
-        Criar os dois bappers, right e left
+        Funcao para desenhar os elementos em formato de bola
+        """
+        radius = 60
+        ball_x = self.col_width * (self.col / 2)
+        ball_y = self.row_height * 1
+        pos = (ball_x, ball_y)
+        self.create_a_static_ball(pos, radius)
+
+    def create_buppers(self):
+        """
+        Criar os dois bampers, right e left
         """
         # bumper width e bumper height
         width, height = 80, 80
@@ -115,14 +147,14 @@ class MainMap(AbstractMap):
         vertices_right_bumper = [(0, 0), (width, width), (width, height), (0, height)]
 
         # right bumper
-        right_bumper_x = col_width * 1 + offset
-        right_bumper_y = row_height * 4 - (height + offset)
+        right_bumper_x = self.col_width * 1 + offset
+        right_bumper_y = self.row_height * 4 - (height + offset)
 
         position_right_bumper = (right_bumper_x, right_bumper_y)
 
         # left bumper
-        left_bumper_x = col_width * 4 - (width + offset)
-        left_bumper_y = right_bumper_y
+        left_bumper_x = self.col_width * 4 - (width + offset)
+        left_bumper_y = right_bumper_y  # os dois tem a mesma altura
 
         position_left_bumper = (left_bumper_x, left_bumper_y)
 
@@ -131,7 +163,7 @@ class MainMap(AbstractMap):
         # left bumper
         self.create_static_poly(vertices_left_bumper, position_left_bumper)
 
-    def draw_funnel(self, col_width, row_height, margin_bottom):
+    def draw_funnel(self):
         """
         Funcao para desenhar funil que leva ate os flippers
         """
@@ -142,24 +174,24 @@ class MainMap(AbstractMap):
         # Mesma coisa com a linha
 
         # Segmento pocisionando na primeira coluna até a penultima linha
-        lateral_left = (col_width * 0.8 - incli, row_height * 2), (
-            col_width * 1,
-            row_height * 4,
+        lateral_left = (self.col_width * 0.8 - incli, self.row_height * 2), (
+            self.col_width * 1,
+            self.row_height * 4,
         )
         # Segmento pocisionado na ultima coluna ate a penultina linha
-        lateral_right = (col_width * 4.2 + incli, row_height * 2), (
-            col_width * 4,
-            row_height * 4,
+        lateral_right = (self.col_width * 4.2 + incli, self.row_height * 2), (
+            self.col_width * 4,
+            self.row_height * 4,
         )
 
-        funil_left = (col_width * 1, row_height * 4), (
-            col_width * 2,
-            row_height * 5 - margin_bottom,
+        funil_left = (self.col_width * 1, self.row_height * 4), (
+            self.col_width * 2,
+            self.row_height * 5 - self.margin_bottom,
         )
 
-        funil_right = (col_width * 4, row_height * 4), (
-            col_width * 3,
-            row_height * 5 - margin_bottom,
+        funil_right = (self.col_width * 4, self.row_height * 4), (
+            self.col_width * 3,
+            self.row_height * 5 - self.margin_bottom,
         )
 
         # Adicionando a lista de para desenhar
@@ -169,32 +201,40 @@ class MainMap(AbstractMap):
         self.platforms.append(funil_right)
 
         # Definindo a posicao dos flippers
-        self.flippers = (col_width * 2, row_height * 5 - margin_bottom), (
-            col_width * 3,
-            row_height * 5 - margin_bottom,
+        self.flippers = (
+            self.col_width * 2,
+            self.row_height * 5 - self.margin_bottom,
+        ), (
+            self.col_width * 3,
+            self.row_height * 5 - self.margin_bottom,
         )
 
-    def draw_borders(self, col_width, row_height):
+    def draw_borders(self):
         """
         Desenha bordas entorno da tela
         """
         top_border = (0, 0), (self.width, 0)
-        right_border = (self.width, 0), (self.width, row_height * 2)
-        left_border = (0, 0), (0, row_height * 2)
+        right_border = (self.width, 0), (self.width, self.row_height * 2)
+        left_border = (0, 0), (0, self.row_height * 2)
 
-        lateral_double_left = (0, row_height * 2), (col_width * 0.5, row_height * 4)
-        funil_double_left = (col_width * 0.5, row_height * 4), (
-            col_width * 1.5,
-            row_height * 5,
+        lateral_double_left = (0, self.row_height * 2), (
+            self.col_width * 0.5,
+            self.row_height * 4,
         )
 
-        lateral_double_right = (self.width, row_height * 2), (
-            self.width - col_width * 0.5,
-            row_height * 4,
+        funil_double_left = (self.col_width * 0.5, self.row_height * 4), (
+            self.col_width * 1.5,
+            self.row_height * 5,
         )
-        funil_double_right = (self.width - col_width * 0.5, row_height * 4), (
-            self.width - col_width * 1.5,
-            row_height * 5,
+
+        lateral_double_right = (self.width, self.row_height * 2), (
+            self.width - self.col_width * 0.5,
+            self.row_height * 4,
+        )
+
+        funil_double_right = (self.width - self.col_width * 0.5, self.row_height * 4), (
+            self.width - self.col_width * 1.5,
+            self.row_height * 5,
         )
 
         self.platforms.append(top_border)

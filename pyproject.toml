@@ -17,6 +17,7 @@ disable = [
     "C0114",
     "W0107",
     "W0236",
+    "W0201",
 ]
 
 [tool.pylint.basic]

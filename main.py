@@ -11,7 +11,7 @@ class Game:
     Classe principal criada para gerenciar o jogo
     """
 
-    WIDTH, HEIGHT = 800, 600
+    WIDTH, HEIGHT = 1000, 700
     WIN_SIZE = WIDTH, HEIGHT
     FPS = 60
 

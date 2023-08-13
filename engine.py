@@ -11,8 +11,8 @@ class PysicsEngine2D:
 
     BALL_MASS = 2
     BALL_RADIUS = 10
-    BALL_ELASTICITY = 0.9
-    BALL_FRICTION = 1
+    BALL_ELASTICITY = 1
+    BALL_FRICTION = 0.4
     GRAVITY = 0, 800
     SEGMENT_THICKNESS = 4
     FLIPPER_POLYGON_RIGHT = [(10, -10), (-50, 0), (10, 10)]
@@ -49,11 +49,10 @@ class PysicsEngine2D:
 
         flipper_body = pymunk.Body(mass, moment)
         flipper_body.position = pos
-        flipper_body.elasticity = 5
-        flipper_body.friction = 1
-        flipper_body.density = 1
-        flipper_body.group = 1
         flipper_shape = pymunk.Poly(flipper_body, polygon)
+        flipper_shape.elasticity = 0.4
+        flipper_shape.friction = 1
+        flipper_shape.group = 1
         self.space.add(flipper_body, flipper_shape)
 
         flipper_joint_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
