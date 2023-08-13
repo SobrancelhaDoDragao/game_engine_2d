@@ -1,11 +1,31 @@
+# Arquivo para padronizacao do projeto
+
 [tool.black]
+
 
 [tool.isort]
 profile = "black"
 include_trailing_comma = true
 line_length = 120
 multi_line_output = 3
-
 skip = ["env"]
+
+[tool.pylint]
+max-line-length = 120
+disable = [
+    "E1101",
+    "C0114",
+    "W0107",
+    "W0236",
+]
+
+[tool.pylint.basic]
+variable-naming-style = "snake_case"
+function-naming-style = "snake_case"
+class-naming-style = "PascalCase"
+const-naming-style = "UPPER_CASE"
+argument-naming-style = "snake_case"
+good-names = ["x","y"]
+
 
 

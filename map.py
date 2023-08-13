@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 
 import pygame as pg
 import pymunk
-from pymunk import Vec2d
 
 
 class AbstractMap(ABC):
@@ -28,6 +27,9 @@ class AbstractMap(ABC):
         self.segments_points()
 
     def draw_map(self):
+        """
+        Funcao que desenha o mapa do jogo
+        """
         for plataform in self.platforms:
             self.create_segment(*plataform)
 
@@ -47,6 +49,9 @@ class AbstractMap(ABC):
         self.space.add(segment_shape)
 
     def create_static_poly(self, polygon, pos):
+        """
+        Funcao que cria um poligono statico
+        """
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = pos
         shape = pymunk.Poly(body, polygon)
@@ -76,6 +81,9 @@ class MainMap(AbstractMap):
     """
 
     def segments_points(self):
+        """
+        Funcao que desenha todos os elementos do mapa
+        """
         # Vou usar o conceito de GRID para posicionar os elementos na tela.
         col, row = 5, 5
         # Dividindo a largura da tela pela quantidade de colunas
@@ -90,31 +98,38 @@ class MainMap(AbstractMap):
         self.draw_polys(col_width, row_height)
 
     def draw_polys(self, col_width, row_height):
+        """
+        Funcao que desenha os buppers
+        """
         self.create_buppers(col_width, row_height)
 
     def create_buppers(self, col_width, row_height):
+        """
+        Criar os dois bappers, right e left
+        """
+        # bumper width e bumper height
         width, height = 80, 80
-        x = width * 1
-        padding = width // 2
+        offset = width // 2
 
-        # Positio GRID right bumpper
-        width_position = col_width * 1 + padding
-        height_position_right = row_height * 4 - (height + padding)
+        vertices_left_bumper = [(0, width), (width, 0), (width, height), (0, height)]
+        vertices_right_bumper = [(0, 0), (width, width), (width, height), (0, height)]
 
-        # Right bupper
-        vertices_bupper_right = [(0, 0), (width, x), (width, height), (0, height)]
-        position_bupper_right = (width_position, height_position_right)
+        # right bumper
+        right_bumper_x = col_width * 1 + offset
+        right_bumper_y = row_height * 4 - (height + offset)
 
-        self.create_static_poly(vertices_bupper_right, position_bupper_right)
+        position_right_bumper = (right_bumper_x, right_bumper_y)
 
-        # Positio GRID left bumpper
-        width_position_left = col_width * 4 - (width + padding)
+        # left bumper
+        left_bumper_x = col_width * 4 - (width + offset)
+        left_bumper_y = right_bumper_y
 
-        # left bupper
-        vertices_bupper_left = [(0, x), (width, 0), (width, height), (0, height)]
-        position_bupper_left = (width_position_left, height_position_right)
+        position_left_bumper = (left_bumper_x, left_bumper_y)
 
-        self.create_static_poly(vertices_bupper_left, position_bupper_left)
+        # right bumper
+        self.create_static_poly(vertices_right_bumper, position_right_bumper)
+        # left bumper
+        self.create_static_poly(vertices_left_bumper, position_left_bumper)
 
     def draw_funnel(self, col_width, row_height, margin_bottom):
         """
