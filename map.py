@@ -12,23 +12,23 @@ class AbstractMap(ABC):
     Classe abstrada para criação de mapas
     """
 
-    segment_thickness = 5
-    segment_color = pg.Color("black")
-    segment_friction = 0.4
-    segment_elasticity = 0.5
+    SEGMENT_THICKNESS = 5
+    SEGMENT_COLOR = pg.Color("black")
+    SEGMENT_FRICTION = 0.4
+    SEGMENT_ELASTICITY = 0.5
 
-    static_poly_elasticy = 1
-    static_poly_friction = 0.2
-    static_poly_color = pg.Color("green")
+    STATIC_POLY_ELASTICY = 1
+    STATIC_POLY_FRICTION = 0.2
+    STATIC_POLY_COLOR = pg.Color("green")
 
-    static_ball_elasticy = 1
-    static_ball_friction = 0.2
-    static_ball_color = pg.Color("green")
+    STATIC_BALL_ELASTICY = 1
+    STATIC_BALL_FRICTION = 0.2
+    STATIC_BALL_COLOR = pg.Color("green")
 
     def __init__(self, win_size, space):
         self.space = space
-        self.width = win_size[0]
-        self.height = win_size[1]
+        self.screen_width = win_size[0]
+        self.screen_height = win_size[1]
 
         self.platforms = []
 
@@ -48,12 +48,12 @@ class AbstractMap(ABC):
         """
         # posição
         segment_shape = pymunk.Segment(
-            self.space.static_body, from_, to_, self.segment_thickness
+            self.space.static_body, from_, to_, self.SEGMENT_THICKNESS
         )
         # Propriedades do segmento
-        segment_shape.color = self.segment_color
-        segment_shape.friction = self.segment_friction
-        segment_shape.elasticity = self.segment_elasticity
+        segment_shape.color = self.SEGMENT_COLOR
+        segment_shape.friction = self.SEGMENT_FRICTION
+        segment_shape.elasticity = self.SEGMENT_ELASTICITY
         self.space.add(segment_shape)
 
     def create_static_poly(self, polygon, pos):
@@ -63,9 +63,9 @@ class AbstractMap(ABC):
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = pos
         shape = pymunk.Poly(body, polygon)
-        shape.elasticity = self.static_poly_elasticy
-        shape.friction = self.static_poly_friction
-        shape.color = self.static_poly_color
+        shape.elasticity = self.STATIC_POLY_ELASTICY
+        shape.friction = self.STATIC_POLY_FRICTION
+        shape.color = self.STATIC_POLY_COLOR
         self.space.add(body, shape)
 
     def create_a_static_ball(self, pos, radius):
@@ -75,15 +75,15 @@ class AbstractMap(ABC):
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = pos
         shape = pymunk.Circle(body, radius)
-        shape.elasticity = self.static_ball_elasticy
-        shape.friction = self.static_ball_friction
-        shape.color = self.static_ball_color
+        shape.elasticity = self.STATIC_BALL_ELASTICY
+        shape.friction = self.STATIC_BALL_FRICTION
+        shape.color = self.STATIC_BALL_COLOR
         self.space.add(body, shape)
 
     @abstractmethod
     def create_elements(self):
         """
-        Função para calcular as coordenadas dos segmentos: ponto inicial: x,y, ponto final: x,y
+        Funcao que desenha todos os elementos do mapa,  que e chamada no comeco do jogo
         """
         pass
 
@@ -94,6 +94,13 @@ class AbstractMap(ABC):
         """
         pass
 
+    @abstractmethod
+    def ball_creation_position(self):
+        """
+        Posicao que a bola sera criada no jogo
+        """
+        pass
+
 
 class MainMap(AbstractMap):
     """
@@ -101,16 +108,12 @@ class MainMap(AbstractMap):
     """
 
     def create_elements(self):
-        """
-        Funcao que desenha todos os elementos do mapa,  que e chamada no comeco do jogo
-        """
-
         # Vou usar o conceito de GRID para posicionar os elementos na tela.
         self.col, self.row = 5, 5
         # Dividindo a largura da tela pela quantidade de colunas
-        self.col_width = self.width // self.col
+        self.col_width = self.screen_width // self.col
         # Dividindo a altura da tela pela quantidade de linhas
-        self.row_height = self.height // self.row
+        self.row_height = self.screen_height // self.row
 
         self.margin_bottom = 60
 
@@ -134,6 +137,12 @@ class MainMap(AbstractMap):
         ball_y = self.row_height * 1
         pos = (ball_x, ball_y)
         self.create_a_static_ball(pos, radius)
+
+    def draw_launcher(self):
+        """
+        Desenhar o lanchador
+        """
+        pass
 
     def create_buppers(self):
         """
@@ -213,9 +222,13 @@ class MainMap(AbstractMap):
         """
         Desenha bordas entorno da tela
         """
-        top_border = (0, 0), (self.width, 0)
-        right_border = (self.width, 0), (self.width, self.row_height * 2)
+        top_border = (0, 0), (self.screen_width, 0)
+        right_border = (self.screen_width, 0), (self.screen_width, self.screen_height)
         left_border = (0, 0), (0, self.row_height * 2)
+        bottom_border = (
+            self.screen_width - self.col_width * 0.5,
+            self.screen_height,
+        ), (self.screen_width, self.screen_height)
 
         lateral_double_left = (0, self.row_height * 2), (
             self.col_width * 0.5,
@@ -227,19 +240,24 @@ class MainMap(AbstractMap):
             self.row_height * 5,
         )
 
-        lateral_double_right = (self.width, self.row_height * 2), (
-            self.width - self.col_width * 0.5,
-            self.row_height * 4,
-        )
+        margin_right = self.col_width * 0.5
+        lateral_double_right = (
+            self.screen_width - margin_right,
+            self.row_height * 2,
+        ), (self.screen_width - margin_right, self.screen_height)
 
-        funil_double_right = (self.width - self.col_width * 0.5, self.row_height * 4), (
-            self.width - self.col_width * 1.5,
+        funil_double_right = (
+            self.screen_width - self.col_width * 0.5,
+            self.row_height * 4,
+        ), (
+            self.screen_width - self.col_width * 1.5,
             self.row_height * 5,
         )
 
         self.platforms.append(top_border)
         self.platforms.append(left_border)
         self.platforms.append(right_border)
+        self.platforms.append(bottom_border)
         self.platforms.append(lateral_double_left)
         self.platforms.append(funil_double_left)
         self.platforms.append(lateral_double_right)
@@ -248,3 +266,10 @@ class MainMap(AbstractMap):
     @property
     def flippers_position(self):
         return self.flippers
+
+    @property
+    def ball_creation_position(self):
+        return (
+            self.screen_width - self.col_width * 0.3,
+            self.row_height * (self.row / 2),
+        )

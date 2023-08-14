@@ -53,8 +53,8 @@ class Game:
                 and event.key == self.game_engine.K_ESCAPE
             ):
                 self.running = False
-            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:  # LMB
-                self.pysics_engine.new_ball(event.pos)
+            elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                self.pysics_engine.new_ball()
             elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
                 self.pysics_engine.on_press_right_arrow()
             elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:

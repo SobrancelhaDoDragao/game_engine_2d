@@ -11,13 +11,15 @@ class PysicsEngine2D:
 
     BALL_MASS = 2
     BALL_RADIUS = 10
+    BALL_COLOR = (170, 170, 170, 255)
     BALL_ELASTICITY = 1
     BALL_FRICTION = 0.4
-    GRAVITY = 0, 800
-    SEGMENT_THICKNESS = 4
+
     FLIPPER_POLYGON_RIGHT = [(10, -10), (-50, 0), (10, 10)]
     # Invertendo os polygon do flipper right
     FLIPPER_POLYGON_LEFT = [(-x, y) for x, y in FLIPPER_POLYGON_RIGHT]
+    # Gravidade eixo x,y
+    GRAVITY = 0, 800
 
     def __init__(self, game):
         self.screen = game.screen
@@ -31,19 +33,29 @@ class PysicsEngine2D:
         self.draw_flippers()
 
     def update(self):
+        """
+        Metodo que atualiza a fisica
+        """
         self.space.step(1 / self.fps)
         self.space.debug_draw(self.draw_options)
 
-    def new_ball(self, pos):
+    def new_ball(self):
+        """
+        Metodo que cria um nova bola
+        """
         ball_moment = pymunk.moment_for_circle(self.BALL_MASS, 0, self.BALL_RADIUS)
         ball_body = pymunk.Body(self.BALL_MASS, ball_moment)
-        ball_body.position = pos
+        ball_body.position = self.map.ball_creation_position
         ball_shape = pymunk.Circle(ball_body, self.BALL_RADIUS)
+        ball_shape.color = self.BALL_COLOR
         ball_shape.elasticity = self.BALL_ELASTICITY
         ball_shape.friction = self.BALL_FRICTION
         self.space.add(ball_body, ball_shape)
 
     def create_flipper(self, pos, polygon):
+        """
+        Metodo que cria um flipper
+        """
         mass = 1000
         moment = pymunk.moment_for_poly(mass, polygon)
 
@@ -57,15 +69,20 @@ class PysicsEngine2D:
 
         flipper_joint_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
         flipper_joint_body.position = pos
-        j = pymunk.PinJoint(flipper_body, flipper_joint_body, (0, 0))
-        s = pymunk.DampedRotarySpring(
+
+        joint = pymunk.PinJoint(flipper_body, flipper_joint_body, (0, 0))
+
+        rotary_spring = pymunk.DampedRotarySpring(
             flipper_body, flipper_joint_body, 0.10, 20000000, 900000
         )
-        self.space.add(j, s)
+        self.space.add(joint, rotary_spring)
 
         return flipper_body
 
     def draw_flippers(self):
+        """
+        Metodo que desenha os flipers
+        """
         # pos x,y dos flippers
         pos = (
             self.map.flippers_position[1][0] - 20,
@@ -81,11 +98,17 @@ class PysicsEngine2D:
         self.l_flipper_body = self.create_flipper(pos2, self.FLIPPER_POLYGON_LEFT)
 
     def on_press_right_arrow(self):
+        """
+        Controlando o flipper direito
+        """
         self.r_flipper_body.apply_impulse_at_local_point(
             Vec2d.unit() * -50000, (-150, 0)
         )
 
     def on_press_left_arrow(self):
+        """
+        Controlando o fliper esquerdo
+        """
         self.l_flipper_body.apply_impulse_at_local_point(
             Vec2d.unit() * 50000, (-150, 0)
         )
