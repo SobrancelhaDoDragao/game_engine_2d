@@ -119,9 +119,10 @@ class MainMap(AbstractMap):
 
         self.draw_funnel()
         self.draw_borders()
+        self.draw_ball_path()
         self.draw_polys()
         self.draw_balls()
-
+        
     def draw_polys(self):
         """
         Funcao que desenha os buppers
@@ -179,7 +180,7 @@ class MainMap(AbstractMap):
         # Inclinação do segemento que leva a bolinha até o meio
         incli = 40
 
-        # Agora para colocar o elementos na coluna basta multiplicar COL_WIDTH * Numero da coluna
+        # Agora para colocar o elementos na coluna basta multiplicar col_witdh * Numero da coluna
         # Mesma coisa com a linha
 
         # Segmento pocisionando na primeira coluna até a penultima linha
@@ -222,11 +223,13 @@ class MainMap(AbstractMap):
         """
         Desenha bordas entorno da tela
         """
+        margin_right = self.col_width * 0.3
+
         top_border = (0, 0), (self.screen_width, 0)
         right_border = (self.screen_width, 0), (self.screen_width, self.screen_height)
         left_border = (0, 0), (0, self.row_height * 2)
         bottom_border = (
-            self.screen_width - self.col_width * 0.5,
+            self.screen_width - margin_right,
             self.screen_height,
         ), (self.screen_width, self.screen_height)
 
@@ -240,14 +243,13 @@ class MainMap(AbstractMap):
             self.row_height * 5,
         )
 
-        margin_right = self.col_width * 0.5
         lateral_double_right = (
             self.screen_width - margin_right,
-            self.row_height * 2,
+            self.row_height * 1.5,
         ), (self.screen_width - margin_right, self.screen_height)
 
         funil_double_right = (
-            self.screen_width - self.col_width * 0.5,
+            self.screen_width - margin_right,
             self.row_height * 4,
         ), (
             self.screen_width - self.col_width * 1.5,
@@ -263,6 +265,14 @@ class MainMap(AbstractMap):
         self.platforms.append(lateral_double_right)
         self.platforms.append(funil_double_right)
 
+    def draw_ball_path(self):
+        """
+        Caminha da bola para o centro
+        """
+        redirect = (self.col_width * 4,0),(self.screen_width, self.row_height * 1)
+
+        self.platforms.append(redirect)
+
     @property
     def flippers_position(self):
         return self.flippers
@@ -270,6 +280,6 @@ class MainMap(AbstractMap):
     @property
     def ball_creation_position(self):
         return (
-            self.screen_width - self.col_width * 0.3,
-            self.row_height * (self.row / 2),
+            self.screen_width - self.col_width * 0.15,
+            self.row_height * 4,
         )

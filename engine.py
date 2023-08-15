@@ -31,6 +31,7 @@ class PysicsEngine2D:
         self.map = MainMap(game.WIN_SIZE, self.space)
         self.map.draw_map()
         self.draw_flippers()
+        self.ball = None
 
     def update(self):
         """
@@ -43,14 +44,32 @@ class PysicsEngine2D:
         """
         Metodo que cria um nova bola
         """
-        ball_moment = pymunk.moment_for_circle(self.BALL_MASS, 0, self.BALL_RADIUS)
-        ball_body = pymunk.Body(self.BALL_MASS, ball_moment)
-        ball_body.position = self.map.ball_creation_position
-        ball_shape = pymunk.Circle(ball_body, self.BALL_RADIUS)
-        ball_shape.color = self.BALL_COLOR
-        ball_shape.elasticity = self.BALL_ELASTICITY
-        ball_shape.friction = self.BALL_FRICTION
-        self.space.add(ball_body, ball_shape)
+        if not self.is_ball_already_created():
+            ball_moment = pymunk.moment_for_circle(self.BALL_MASS, 0, self.BALL_RADIUS)
+            ball_body = pymunk.Body(self.BALL_MASS, ball_moment)
+            ball_body.position = self.map.ball_creation_position
+            ball_shape = pymunk.Circle(ball_body, self.BALL_RADIUS)
+            ball_shape.color = self.BALL_COLOR
+            ball_shape.elasticity = self.BALL_ELASTICITY
+            ball_shape.friction = self.BALL_FRICTION
+            self.space.add(ball_body, ball_shape)
+
+            self.ball = ball_body
+        # Quando o o botao e apertado uma segunda vez a bola e lancada
+        else:
+            self.launch_ball()
+
+    def is_ball_already_created(self):
+        """
+        Verifica se ja existe uma bola
+        """
+        return self.ball is not None
+
+    def launch_ball(self):
+        """
+        Metodo para lancar a bola
+        """
+        self.ball.apply_impulse_at_local_point((0, -2500), (0, 0))
 
     def create_flipper(self, pos, polygon):
         """
@@ -65,6 +84,7 @@ class PysicsEngine2D:
         flipper_shape.elasticity = 0.4
         flipper_shape.friction = 1
         flipper_shape.group = 1
+
         self.space.add(flipper_body, flipper_shape)
 
         flipper_joint_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
@@ -75,6 +95,7 @@ class PysicsEngine2D:
         rotary_spring = pymunk.DampedRotarySpring(
             flipper_body, flipper_joint_body, 0.10, 20000000, 900000
         )
+
         self.space.add(joint, rotary_spring)
 
         return flipper_body
@@ -102,13 +123,11 @@ class PysicsEngine2D:
         Controlando o flipper direito
         """
         self.r_flipper_body.apply_impulse_at_local_point(
-            Vec2d.unit() * -50000, (-150, 0)
+            Vec2d.unit() * -50000, (-50, 0)
         )
 
     def on_press_left_arrow(self):
         """
         Controlando o fliper esquerdo
         """
-        self.l_flipper_body.apply_impulse_at_local_point(
-            Vec2d.unit() * 50000, (-150, 0)
-        )
+        self.l_flipper_body.apply_impulse_at_local_point(Vec2d.unit() * 50000, (-50, 0))
