@@ -1,7 +1,6 @@
 import pymunk.pygame_util
-from pymunk import Vec2d
-
 from map import MainMap
+from pymunk import Vec2d
 
 
 class PysicsEngine2D:
@@ -123,11 +122,13 @@ class PysicsEngine2D:
         Controlando o flipper direito
         """
         self.r_flipper_body.apply_impulse_at_local_point(
-            Vec2d.unit() * -50000, (-50, 0)
+            Vec2d.unit() * -50000, (-150, 0)
         )
 
     def on_press_left_arrow(self):
         """
         Controlando o fliper esquerdo
         """
-        self.l_flipper_body.apply_impulse_at_local_point(Vec2d.unit() * 50000, (-50, 0))
+        self.l_flipper_body.apply_impulse_at_local_point(
+            Vec2d.unit() * 50000, (-150, 0)
+        )

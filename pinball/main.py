@@ -2,7 +2,6 @@
 Arquivo principal do projeto. Nesse arquivo todos os arquivos sao chamados
 """
 import pygame as pg
-
 from engine import PysicsEngine2D
 
 
