@@ -24,7 +24,6 @@ class MainMap(AbstractMap):
     def create_segments(self):
         self.draw_funnel()
         self.draw_borders()
-        # self.draw_ball_path()
 
     def create_polys(self):
         """
@@ -37,7 +36,7 @@ class MainMap(AbstractMap):
         """
         Metodo que deve criar todas as bolas e adicionar no self.balls
         """
-        self.draw_balls()
+        self.draw_static_center_ball()
 
     def draw_funnel(self):
         """
@@ -102,7 +101,7 @@ class MainMap(AbstractMap):
 
         lateral_double_right = (
             self.screen_width - margin_right,
-            self.row_height * 1.5,
+            self.row_height * 2,
         ), (self.screen_width - margin_right, self.screen_height)
 
         funil_double_right = (
@@ -155,7 +154,7 @@ class MainMap(AbstractMap):
 
     def create_bumper_lauch(self):
         """
-        Criando um bumper para desviar a bola
+        Criando um bumper para desviar a bola depois do lancamento
         """
         # bumper width e bumper height
         width, height = 80, 80
@@ -172,9 +171,9 @@ class MainMap(AbstractMap):
 
         self.polys.append(bumper)
 
-    def draw_balls(self):
+    def draw_static_center_ball(self):
         """
-        Funcao para desenhar os elementos em formato de bola
+        Funcao para desenhar bolas staticas
         """
         radius = 60
         ball_x = self.col_width * (self.col / 2)
@@ -184,18 +183,6 @@ class MainMap(AbstractMap):
         ball = (radius, pos)
 
         self.balls.append(ball)
-
-    def draw_ball_path(self):
-        """
-        Caminha da bola para o centro
-        """
-        redirect = (self.col_width * 4, 0), (self.screen_width, self.row_height * 1)
-        redirect_line2 = (self.col_width * 3.5, self.row_height * 0.5), (
-            self.col_width * 4.7,
-            self.row_height * 1.5,
-        )
-        self.segments.append(redirect)
-        self.segments.append(redirect_line2)
 
     @property
     def flippers_position(self):

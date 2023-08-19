@@ -58,7 +58,10 @@ class Game:
                 self.pysics_engine.on_press_right_arrow()
             elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
                 self.pysics_engine.on_press_left_arrow()
-
+            elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
+                self.pysics_engine.load_ball()
+            elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                self.pysics_engine.throw_ball()
 
 # Caso o arquivo esteja sendo executado diretamente como arquivo principal
 if __name__ == "__main__":

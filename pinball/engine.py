@@ -8,11 +8,15 @@ class PysicsEngine2D:
     Classe criada para gerenciar a fisica do jogo
     """
 
-    BALL_MASS = 2
-    BALL_RADIUS = 10
+    BALL_MASS = 1
+    BALL_RADIUS = 15
     BALL_COLOR = (170, 170, 170, 255)
     BALL_ELASTICITY = 1
     BALL_FRICTION = 0.4
+
+    LAUNCHER_REST = 300  # Tamanho da bola quando esta sem peso
+    LAUNCHER_STIFFNESS = 1000  # Resistencia da mola
+    LAUNCHER_DAMPING = 20  # Nao entendi esse
 
     FLIPPER_POLYGON_RIGHT = [(10, -10), (-50, 0), (10, 10)]
     # Invertendo os polygon do flipper right
@@ -22,6 +26,8 @@ class PysicsEngine2D:
 
     def __init__(self, game):
         self.screen = game.screen
+        self.screen_width = game.WIDTH
+        self.screen_height = game.HEIGHT
         pymunk.pygame_util.positive_y_is_up = False
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
         self.space = pymunk.Space()
@@ -30,6 +36,7 @@ class PysicsEngine2D:
         self.map = MainMap(game.WIN_SIZE, self.space)
         self.map.draw_map()
         self.draw_flippers()
+        self.create_launcher()
         self.ball = None
 
     def update(self):
@@ -38,6 +45,10 @@ class PysicsEngine2D:
         """
         self.space.step(1 / self.fps)
         self.space.debug_draw(self.draw_options)
+        if self.is_ball_already_created():
+            if self.is_ball_out_of_screen():
+                # TODO preciso remover a bola do espaco
+                self.ball = None
 
     def new_ball(self):
         """
@@ -46,7 +57,10 @@ class PysicsEngine2D:
         if not self.is_ball_already_created():
             ball_moment = pymunk.moment_for_circle(self.BALL_MASS, 0, self.BALL_RADIUS)
             ball_body = pymunk.Body(self.BALL_MASS, ball_moment)
-            ball_body.position = self.map.ball_creation_position
+            ball_body.position = (
+                self.map.ball_creation_position[0],
+                self.map.ball_creation_position[1] - 300,
+            )
             ball_shape = pymunk.Circle(ball_body, self.BALL_RADIUS)
             ball_shape.color = self.BALL_COLOR
             ball_shape.elasticity = self.BALL_ELASTICITY
@@ -54,9 +68,6 @@ class PysicsEngine2D:
             self.space.add(ball_body, ball_shape)
 
             self.ball = ball_body
-        # Quando o o botao e apertado uma segunda vez a bola e lancada
-        else:
-            self.launch_ball()
 
     def is_ball_already_created(self):
         """
@@ -64,11 +75,17 @@ class PysicsEngine2D:
         """
         return self.ball is not None
 
-    def launch_ball(self):
+    def load_ball(self):
         """
         Metodo para lancar a bola
         """
-        self.ball.apply_impulse_at_local_point((0, -2500), (0, 0))
+        self.launcher.stiffness = self.launcher.stiffness / 2
+
+    def throw_ball(self):
+        """
+        Funcao para arremessar a bola
+        """
+        self.launcher.stiffness = self.LAUNCHER_STIFFNESS
 
     def create_flipper(self, pos, polygon):
         """
@@ -116,6 +133,75 @@ class PysicsEngine2D:
 
         self.r_flipper_body = self.create_flipper(pos, self.FLIPPER_POLYGON_RIGHT)
         self.l_flipper_body = self.create_flipper(pos2, self.FLIPPER_POLYGON_LEFT)
+
+    def create_launcher(self):
+        """
+        Criando lancador da bola
+        """
+        launcher_position = (
+            self.map.ball_creation_position[0],
+            self.map.ball_creation_position[1],
+        )
+
+        top_platform_mass = 10
+        lower_platform_mass = 100
+
+        width, height = 50, 10
+        vertices = [
+            (-width / 2, -height / 2),
+            (width / 2, -height / 2),
+            (width / 2, height / 2),
+            (-width / 2, height / 2),
+        ]
+
+        moment_for_top_platform = pymunk.moment_for_poly(top_platform_mass, vertices)
+        moment_for_lower_platform = pymunk.moment_for_poly(
+            lower_platform_mass, vertices
+        )
+
+        body_top = pymunk.Body(top_platform_mass, moment_for_top_platform)
+        body_lower = pymunk.Body(lower_platform_mass, moment_for_lower_platform)
+
+        body_top.position = (launcher_position[0], launcher_position[1] - 250)
+        body_lower.position = (launcher_position[0], launcher_position[1] + 100)
+
+        shape_top = pymunk.Poly(body_top, vertices)
+        shape_lower = pymunk.Poly(body_lower, vertices)
+
+        shape_top.color = self.BALL_COLOR
+        shape_lower.color = self.BALL_COLOR
+
+        self.space.add(body_top, shape_top)
+        self.space.add(body_lower, shape_lower)
+
+        joint = pymunk.constraints.DampedSpring(
+            body_top,
+            body_lower,
+            (0, 0),
+            (0, 0),
+            self.LAUNCHER_REST,
+            self.LAUNCHER_STIFFNESS,
+            self.LAUNCHER_DAMPING,
+        )
+
+        self.launcher = joint
+        self.space.add(joint)
+
+    def is_ball_out_of_screen(self):
+        """
+        Verificando se a bola saiu da tela
+        """
+        # TODO nao funciona corretamente. Demora para verificar se a bola saiu
+        return (
+            self.ball.position[0] > self.screen_width
+            and self.ball.position[1] > self.screen_height
+        )
+
+    def limit_velocity(self):
+        """
+        Metodo para limitar a velocidade da bola, para evitar dela atravessar objetos
+        """
+        pass
 
     def on_press_right_arrow(self):
         """
