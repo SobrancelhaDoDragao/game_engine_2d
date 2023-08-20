@@ -1,2 +1,0 @@
-- Melhorar o poligono dos flipers
-- Melhorar a fisica dos flipers
