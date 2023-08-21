@@ -18,11 +18,9 @@ class PysicsEngine2D:
     LAUNCHER_STIFFNESS = 1000  # Resistencia da mola
     LAUNCHER_DAMPING = 20  # Nao entendi esse
 
-    # TODO melhorar os polignos do fliper
-    FLIPPER_WIDTH, FLIPPER_HEIGHT = 80, 10
-    FLIPPER_POLYGON_RIGHT = [(-FLIPPER_WIDTH / 2, -FLIPPER_HEIGHT / 2),(FLIPPER_WIDTH / 2, -FLIPPER_HEIGHT / 2),(FLIPPER_WIDTH / 2, FLIPPER_HEIGHT / 2),(-FLIPPER_WIDTH / 2, FLIPPER_HEIGHT / 2),]
+    FLIPPER_POLYGON_RIGHT = [(10, -10), (-50, 0), (10, 10)]
     # Invertendo os polygon do flipper right
-    FLIPPER_POLYGON_LEFT = [(-FLIPPER_WIDTH / 2, -FLIPPER_HEIGHT / 2),(FLIPPER_WIDTH / 2, -FLIPPER_HEIGHT / 2),(FLIPPER_WIDTH / 2, FLIPPER_HEIGHT / 2),(-FLIPPER_WIDTH / 2, FLIPPER_HEIGHT / 2),]
+    FLIPPER_POLYGON_LEFT = [(-x, y) for x, y in FLIPPER_POLYGON_RIGHT]
     # Gravidade eixo x,y
     GRAVITY = 0, 800
 
@@ -41,6 +39,7 @@ class PysicsEngine2D:
         self.create_launcher()
         self.ball_body = None
         self.ball_shape = None
+        self.new_ball()
 
     def update(self):
         """
@@ -51,9 +50,10 @@ class PysicsEngine2D:
         if self.is_ball_already_created():
             if self.is_ball_out_of_screen():
                 # Removendo bolas que sairam da tela
-                self.space.remove(self.ball_body,self.ball_shape)
+                self.space.remove(self.ball_body, self.ball_shape)
                 self.ball_body = None
                 self.ball_shape = None
+                self.new_ball()
 
     def new_ball(self):
         """
@@ -67,7 +67,7 @@ class PysicsEngine2D:
                 self.map.ball_creation_position[1] - 300,
             )
             ball_shape = pymunk.Circle(ball_body, self.BALL_RADIUS)
-            ball_shape.color = self.BALL_COLOR
+            ball_shape.color = self.map.BALL_COLOR
             ball_shape.elasticity = self.BALL_ELASTICITY
             ball_shape.friction = self.BALL_FRICTION
             self.space.add(ball_body, ball_shape)
@@ -82,13 +82,13 @@ class PysicsEngine2D:
 
     def load_ball(self):
         """
-        Metodo para lancar a bola
+        Metodo para carregar a forca da mola
         """
         self.launcher.stiffness = self.launcher.stiffness / 2
 
     def throw_ball(self):
         """
-        Funcao para arremessar a bola
+        Metodo para arremessar a bola
         """
         self.launcher.stiffness = self.LAUNCHER_STIFFNESS
 
@@ -106,15 +106,17 @@ class PysicsEngine2D:
         flipper_shape.friction = 1
         flipper_shape.group = 1
 
+        flipper_shape.color = self.map.FLIPPER_COLOR
+
         self.space.add(flipper_body, flipper_shape)
 
         flipper_joint_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
         flipper_joint_body.position = pos
 
-        joint = pymunk.PinJoint(flipper_body, flipper_joint_body, (0,0),(0,0))
+        joint = pymunk.PinJoint(flipper_body, flipper_joint_body, (0, 0), (0, 0))
 
         rotary_spring = pymunk.DampedRotarySpring(
-            flipper_body, flipper_joint_body, 0, 20000000, 80
+            flipper_body, flipper_joint_body, 0, 20000000, 900000
         )
 
         self.space.add(joint, rotary_spring)
@@ -143,7 +145,7 @@ class PysicsEngine2D:
         """
         Criando lancador da bola
         """
-        # TODO Preciso definir um padro de largura do launcher
+        # TODO Preciso definir um padrao de largura do launcher
         launcher_position = (
             self.map.ball_creation_position[0],
             self.map.ball_creation_position[1],
@@ -174,8 +176,8 @@ class PysicsEngine2D:
         shape_top = pymunk.Poly(body_top, vertices)
         shape_lower = pymunk.Poly(body_lower, vertices)
 
-        shape_top.color = self.BALL_COLOR
-        shape_lower.color = self.BALL_COLOR
+        shape_top.color = self.map.LAUNCHER_COLOR
+        shape_lower.color = self.map.LAUNCHER_COLOR
 
         self.space.add(body_top, shape_top)
         self.space.add(body_lower, shape_lower)
@@ -197,21 +199,20 @@ class PysicsEngine2D:
         """
         Verificando se a bola saiu da tela pela borda inferior
         """
-        return (self.ball_body.position[1] > self.screen_height)
+        return self.ball_body.position[1] > self.screen_height
 
     def limit_velocity(self):
         """
         Metodo para limitar a velocidade da bola, para evitar dela atravessar objetos
         """
         pass
-    
-    # TODO melhorar a fisica dos flippers
+
     def on_press_right_arrow(self):
         """
         Controlando o flipper direito
         """
         self.r_flipper_body.apply_impulse_at_local_point(
-            Vec2d.unit() * -50000, (-150, 0)
+            Vec2d.unit() * -50000, (-120, 0)
         )
 
     def on_press_left_arrow(self):
@@ -219,5 +220,5 @@ class PysicsEngine2D:
         Controlando o fliper esquerdo
         """
         self.l_flipper_body.apply_impulse_at_local_point(
-            Vec2d.unit() * 50000, (-150, 0)
+            Vec2d.unit() * 50000, (-120, 0)
         )

@@ -3,6 +3,7 @@ Classes para criação de mapas do pinball
 """
 from base import AbstractMap
 
+
 # TODO Trocar as cores do elementos
 class MainMap(AbstractMap):
     """

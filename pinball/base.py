@@ -3,7 +3,6 @@ Classes bases para serem implementadas
 """
 from abc import ABC, abstractmethod
 
-import pygame as pg
 import pymunk
 
 
@@ -13,17 +12,21 @@ class AbstractMap(ABC):
     """
 
     SEGMENT_THICKNESS = 5
-    SEGMENT_COLOR = pg.Color("black")
+    SEGMENT_COLOR = (4, 41, 64, 255)
     SEGMENT_FRICTION = 0.4
     SEGMENT_ELASTICITY = 0.5
 
     STATIC_POLY_ELASTICY = 1
     STATIC_POLY_FRICTION = 0.2
-    STATIC_POLY_COLOR = pg.Color("green")
+    STATIC_POLY_COLOR = (214, 213, 142, 255)
 
     STATIC_BALL_ELASTICY = 1
     STATIC_BALL_FRICTION = 0.2
-    STATIC_BALL_COLOR = pg.Color("green")
+    STATIC_BALL_COLOR = (214, 213, 142, 255)
+
+    FLIPPER_COLOR = (219, 242, 39, 255)
+    LAUNCHER_COLOR = (214, 213, 142, 255)
+    BALL_COLOR = (0, 92, 83, 255)
 
     def __init__(self, win_size, space):
         self.space = space
@@ -89,6 +92,27 @@ class AbstractMap(ABC):
         shape.friction = self.STATIC_BALL_FRICTION
         shape.color = self.STATIC_BALL_COLOR
         self.space.add(body, shape)
+
+    @property
+    def flippers_color(self):
+        """
+        Metodo que retorna a cor do flipper
+        """
+        return self.FLIPPER_COLOR
+
+    @property
+    def launcher_color(self):
+        """
+        Metodo que retona a cor do laucher
+        """
+        return self.LAUNCHER_COLOR
+
+    @property
+    def ball_color(self):
+        """
+        Metodo que retona a cor do laucher
+        """
+        return self.BALL_COLOR
 
     @abstractmethod
     def create_segments(self):
