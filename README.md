@@ -24,4 +24,4 @@ Estava com vontade de tentar fazer algo fora da area de desenvolvimento web e re
 
 - Instalando as dependências com: <code>pip install -r requirements.txt</code>
 - Para iniciar o jogo <code>python main</code>
-- Controles: Botão esquerdo do mouse cria bolas, F e J controla os flippers.
+- Controles: Seta direita e esquerda controla os flippers, seta cima e baixo controlar o lançamento da bola.
