@@ -4,7 +4,7 @@
 
 <img src="preview.gif">
 
-#### Status: Em progresso
+#### Status: Finalizado
 
 </div>
 
